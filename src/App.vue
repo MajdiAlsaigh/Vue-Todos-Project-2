@@ -1,9 +1,9 @@
 <script setup>
-import TodoHeader from "@/components/TodoHeader.vue";
+import TheNavigation from "@/components/TheNavigation.vue";
 </script>
 
 <template>
-  <TodoHeader />
+  <TheNavigation />
   <RouterView />
 </template>
 
@@ -17,7 +17,7 @@ import TodoHeader from "@/components/TodoHeader.vue";
   box-sizing: border-box;
 }
 
-html{
+html {
   background-color: lightgray;
 }
 

@@ -17,6 +17,11 @@
 </template>
 
 <style lang="scss" scoped>
+.router-link-active {
+  padding-bottom: 0.25rem;
+  border-bottom: 3px solid #22ab7a;
+}
+
 header {
   background-color: #f2f2f2;
   nav {
@@ -49,10 +54,6 @@ header {
         font-size: 1.2rem;
         text-decoration: none;
         color: inherit;
-
-        &:hover {
-          // font-weight: bold;
-        }
       }
     }
   }

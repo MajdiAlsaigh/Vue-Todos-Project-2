@@ -1,20 +1,87 @@
 <script setup>
-import { ref } from "vue";
-import TodoCreator from "@/components/TodoCreator.vue";
+import { ref, watch, computed } from "vue";
 import { uid } from "uid";
+import { Icon } from "@iconify/vue";
+import TodoCreator from "@/components/TodoCreator.vue";
+import TodoItem from "@/components/TodoItem.vue";
 
 const todoList = ref([]);
-const createTodo = () => {
+
+watch(
+  todoList,
+  () => {
+    setTodoListLocalStorage();
+  },
+  { deep: true }
+);
+
+const todoCompleted = computed(() => {
+  return todoList.value.every((todo) => todo.isCompleted);
+});
+
+const fetchTodoList = () => {
+  const savedTodoList = JSON.parse(localStorage.getItem("todoList"));
+  if (savedTodoList) {
+    todoList.value = savedTodoList;
+  }
+};
+fetchTodoList();
+
+const setTodoListLocalStorage = () => {
+  localStorage.setItem("todoList", JSON.stringify(todoList.value));
+};
+
+const createTodo = (todo) => {
   todoList.value.push({
     id: uid(),
+    todo,
+    isCompleted: null,
+    isEditing: null,
   });
+};
+
+const toggleTodoComplete = (todoIndex) => {
+  todoList.value[todoIndex].isCompleted =
+    !todoList.value[todoIndex].isCompleted;
+};
+
+const toggleTodoEdit = (todoIndex) => {
+  todoList.value[todoIndex].isEditing = !todoList.value[todoIndex].isEditing;
+};
+
+const updateTodo = (todoNewValue, todoIndex) => {
+  todoList.value[todoIndex].todo = todoNewValue;
+};
+
+const deleteTodo = (todoId) => {
+  todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
 };
 </script>
 
 <template>
   <main>
     <h1>Create Todo</h1>
-    <TodoCreator @create-todo="craeteTodo" />
+    <TodoCreator @create-todo="createTodo" />
+    <ul v-if="todoList.length > 0" class="todo-list">
+      <TodoItem
+        v-for="(todo, index) in todoList"
+        :key="todo.id"
+        :todo="todo"
+        :index="index"
+        @toggle-complete="toggleTodoComplete"
+        @edit-todo="toggleTodoEdit"
+        @update-todo="updateTodo"
+        @delete-todo="deleteTodo"
+      />
+    </ul>
+    <p v-else class="todos-msg">
+      <Icon icon="noto-v1:sad-but-relieved-face" />
+      <span>You have no todo's to complete! Add one!</span>
+    </p>
+    <p v-if="todoCompleted && todoList.length > 0" class="todos-msg">
+      <Icon icon="noto-v1:party-popper" />
+      <span>You have completed all your todos!</span>
+    </p>
   </main>
 </template>
 
@@ -37,7 +104,7 @@ main {
     flex-direction: column;
     list-style: none;
     margin-top: 24px;
-    gap: 20px;
+    // gap: 20px;
   }
 
   .todos-msg {
